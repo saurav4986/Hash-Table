@@ -1,8 +1,12 @@
 package com.bridgeLabz.HashTable;
-/*(UC-1_Frequency)
-Ability to find frequency of words in a sentence like “To be or not to be”
+/*(UC-2_Para-Frequency)
+Ability to find frequency of words in a large paragraph phrase
+“Paranoids are not paranoid because they are paranoid but because they
+keep putting themselves deliberately into paranoid avoidable situations”
+- Use hashcode to find index of the words in the para
+- Create LinkedList for each index and store the words and its frequency
 - Use LinkedList to do the Hash Table Operation
-- To do this we create MyMapNode with Key Value Pair and create LinkedList of MyMapNode*/
+- To do this create MyMapNode with Key Value Pair and create LinkedList of MyMapNode*/
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -64,31 +68,46 @@ public class MyMapNode<K,V> {
     public void add(K key, V value)
     {
 
-        HashNode<K,V> newNode = new HashNode(key, value, hashcode(key));
+        HashNode<K,V> newnode = new HashNode(key, value, hashcode(key));
         int index = getBucketIndex(key);
 
         HashNode head = bucketList.get(index);
 
         if(head == null)
         {
-            bucketList.set(index, newNode);
+            bucketList.set(index, newnode);
+            size++;
+            if(size >= numBuckets)
+                expandList();
             return;
         }
 
-        HashNode tempNode = head;
+        HashNode tempnode = head;
 
-        while(tempNode != null)
+        while(tempnode != null)
         {
-            if(tempNode.key.equals(key))
+            if(tempnode.key.equals(key))
             {
-                tempNode.value = ((Integer)tempNode.value) + (Integer)value;
+                tempnode.value = ((Integer)tempnode.value) + (Integer)value;
                 return;
             }
-            tempNode = tempNode.next;
+            tempnode = tempnode.next;
         }
 
-        newNode.next = head;
-        bucketList.set(index, newNode);
+        newnode.next = head;
+        bucketList.set(index, newnode);
+        size++;
+        if(size >= numBuckets)
+            expandList();
+    }
+
+    public void expandList()
+    {
+        for(int i=0;i<10;i++)
+        {
+            bucketList.add(null);
+        }
+        this.numBuckets = 20;
     }
 
     public void display()
@@ -112,15 +131,17 @@ public class MyMapNode<K,V> {
     public static void main(String[] args) {
 
         MyMapNode<String, Integer> map = new MyMapNode();
-        String s = "To be or not to be";
-        String[] arr = s.split("\\s");
+        String s = "Paranoids are not paranoid because they are paranoid but because they keep putting themselves deliberately into paranoid avoidable situations";
+        String arr[] = s.split("\\s");
 
-        for (String value : arr) {
-            map.add(value, 1);
+        for(int i=0;i<arr.length;i++)
+        {
+            map.add(arr[i], 1);
         }
 
         System.out.println("Frequency of words is as follows");
         map.display();
+        System.out.println("size is " + map.size+ " no of buckets is "+ map.numBuckets);
     }
 
 }
